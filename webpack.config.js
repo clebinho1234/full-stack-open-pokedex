@@ -42,18 +42,7 @@ module.exports = {
     extensions: ["*", ".js", ".jsx"],
   },
   devServer: {
-    port: 3000,
     historyApiFallback: true,
-    before(app) {
-      const { chromium } = require('playwright');
-
-      app.get('/open-browser', async (req, res) => {
-        const browser = await chromium.launch();
-        const page = await browser.newPage();
-        await page.goto('http://localhost:3000');
-        res.send('Browser opened with Playwright');
-      });
-    }
   },
   plugins: [
     new HtmlWebPackPlugin({
