@@ -15,8 +15,6 @@ jobs:
           node-version: '20'
       - name: Install dependencies 
         run: npm install
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
       - name: lint
         run: npm run eslint
       - name: build
@@ -24,4 +22,4 @@ jobs:
       - name: test
         run: npm run test
       - name: playwright tests
-        run: npx playwright test
+        run: npm run test:e2e
