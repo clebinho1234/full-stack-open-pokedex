@@ -21,6 +21,7 @@ jobs:
       - name: lint
         run: npm run eslint
       - name: build
+        if: ${{ github.event_name == 'push' }}
         run: npm run build
       - name: test
         run: npm run test
