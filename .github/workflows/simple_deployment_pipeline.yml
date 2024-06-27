@@ -33,6 +33,13 @@ jobs:
         run: npx playwright install --with-deps
       - name: playwright tests
         run: npm run test:e2e
+      - name: failure indication when a build fails
+        if: ${{ failure() }}
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          details: Build has failed!
+          severity: error
 
   tag_release:
     needs: [simple_deployment_pipeline]
@@ -47,3 +54,10 @@ jobs:
         with:
           release_branches: main
           semver: patch
+      - name: success indication when a new version is deployed
+        if: ${{ success() }}
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          details: A new version has been deployed!
+          severity: info
