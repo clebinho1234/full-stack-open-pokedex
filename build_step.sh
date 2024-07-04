@@ -1,5 +1,10 @@
 #!/bin/bash
 
-echo "Build script"
+echo "Running custom build steps"
 
-# Adicione seus comandos aqui
+npm install
+npm run eslint
+npm run build
+npm run test
+npx playwright install --with-deps
+npm run test:e2e
