@@ -25,6 +25,9 @@ jobs:
       - name: Run build script
         if: ${{ github.event_name == 'push' && !contains(env.commit_messages, '#skip') }}
         run: ./build_step.sh
+      - name: Trigger deployment
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip')}}
+        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: failure indication when a build fails
         if: ${{ failure() }}
         uses: rjstone/discord-webhook-notify@v1.0.4
@@ -53,16 +56,3 @@ jobs:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           details: A new version has been deployed!
           severity: info
-          
-  deploy_to_render:
-      needs: [tag_release]
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Deploy to Render
-          env:
-            RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          run: |
-            curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"serviceId": "srv-cq388ocs1f4s73fasqr0?key=-BEu1wo8grU"}' \
-            https://api.render.com/v1/services/srv-cq388ocs1f4s73fasqr0?key=-BEu1wo8grU/deploys
