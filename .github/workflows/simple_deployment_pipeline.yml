@@ -16,10 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Capture commit messages
-        id: capture-commit-messages
-        run: |
-          echo "commit_messages=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
       - name: Set execute permission for build_step.sh
         run: chmod +x build_step.sh
       - name: Run build script
