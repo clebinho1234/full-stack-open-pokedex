@@ -16,14 +16,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Set execute permission for build_step.sh
-        run: chmod +x build_step.sh
-      - name: Run build script
-        if: ${{ github.event_name == 'push' && !contains(env.commit_messages, '#skip') }}
-        run: ./build_step.sh
-      - name: Trigger deployment
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip')}}
-        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run Lint
+        run: npm run eslint
+      - name: Build
+        run: npm run build
+
       - name: failure indication when a build fails
         if: ${{ failure() }}
         uses: rjstone/discord-webhook-notify@v1.0.4
@@ -31,6 +30,17 @@ jobs:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           details: Build has failed!
           severity: error
+          
+      - name: Run Test
+        run: npm test
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npm run test:e2e -- --project chromium
+        
+      - name: Trigger deployment
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip')}}
+        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
   tag_release:
     needs: [simple_deployment_pipeline]
